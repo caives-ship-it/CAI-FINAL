@@ -49,7 +49,7 @@
       <div>
         <p class="eyebrow">Boarding pass lingüístico</p>
         <h1>Reserva tu lugar en la próxima actividad del CAI</h1>
-        <p class="hero-sub">Escribe tu matrícula y datos para confirmar tu registro a la actividad deseada.</p>
+        <p class="hero-sub">Ingresa tu matrícula y datos para reservar tu lugar en las actividades y talleres del CAI.</p>
       </div>
       <div class="hero-stamp" id="heroStamp">
         <svg viewBox="0 0 120 120" width="100" height="100"><circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="6 5"/><text x="60" y="55" text-anchor="middle" font-family="IBM Plex Mono" font-size="15" fill="currentColor" font-weight="600">CAI</text><text x="60" y="72" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="currentColor">UVP · ENGLISH</text></svg>
@@ -84,10 +84,33 @@
             </label>
           </div>
 
-          <!-- CAMPO TEXTUAL DIRECTO PARA ACTIVIDAD/SESIÓN (SIN MENU DESPLEGABLE) -->
-          <label>Actividad / Sesión
-            <input type="text" id="f_sesion" placeholder="Escribe el nombre del taller u horario" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; margin-top: 0.25rem;">
+          <!-- NOMBRE DE LA ACTIVIDAD -->
+          <label>Nombre de la actividad
+            <input type="text" id="f_actividad_nombre" placeholder="Ej. Club de Conversación" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; margin-top: 0.25rem;">
           </label>
+
+          <!-- HORARIOS DESPLEGABLES POR HORA -->
+          <label style="margin-top: 1rem; display: block;">Horario
+            <select id="f_horario_select" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; margin-top: 0.25rem;">
+              <option value="">— Selecciona un horario —</option>
+              <option value="07:00 AM - 08:00 AM">07:00 AM - 08:00 AM</option>
+              <option value="08:00 AM - 09:00 AM">08:00 AM - 09:00 AM</option>
+              <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
+              <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+              <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+              <option value="12:00 PM - 01:00 PM">12:00 PM - 01:00 PM</option>
+              <option value="01:00 PM - 02:00 PM">01:00 PM - 02:00 PM</option>
+              <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+              <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
+              <option value="04:00 PM - 05:00 PM">04:00 PM - 05:00 PM</option>
+              <option value="05:00 PM - 06:00 PM">05:00 PM - 06:00 PM</option>
+              <option value="06:00 PM - 07:00 PM">06:00 PM - 07:00 PM</option>
+              <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM</option>
+            </select>
+          </label>
+
+          <!-- Input oculto para compatibilidad con el estado local -->
+          <input type="hidden" id="f_sesion" value="">
 
           <div id="sesionPreview" class="sesion-preview hidden"></div>
           <div id="formMsg" class="form-msg hidden"></div>
@@ -98,7 +121,7 @@
 
       <div class="card catalog-card">
         <h2>Talleres y clubes disponibles</h2>
-        <p class="muted-sm">Consulta objetivo, nivel y sede antes de registrarte.</p>
+        <p class="muted-sm">Consulta las opciones disponibles para registrar tu horario preferido.</p>
         <div id="catalogList" class="catalog-list"></div>
       </div>
     </div>
@@ -125,7 +148,7 @@
     <div class="card">
       <div class="table-wrap">
         <table id="docTable">
-          <thead><tr><th>Actividad</th><th>Fecha</th><th>Estudiante</th><th>Matrícula</th><th>Carrera</th><th>Grupo</th><th>Estado</th></tr></thead>
+          <thead><tr><th>Actividad</th><th>Horario</th><th>Estudiante</th><th>Matrícula</th><th>Carrera</th><th>Grupo</th><th>Estado</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -135,13 +158,28 @@
   <!-- ============ TAB: ASISTENCIA ============ -->
   <section class="tab-panel" id="tab-asistencia">
     <h1>Escaneo de asistencia</h1>
-    <p class="section-sub">Selecciona la sesión del día y escanea la credencial (QR) de cada estudiante. El lector funciona como teclado: solo mantén el cursor en el campo de abajo.</p>
+    <p class="section-sub">Selecciona el bloque de horario activo para tomar asistencia. Al escanear la credencial, el sistema registrará la presencia en la actividad correspondiente a esa hora.</p>
 
     <div class="card">
-      <label>Sesión activa
-        <select id="scan_sesion"></select>
+      <label>Bloque de horario a tomar asistencia
+        <select id="scan_sesion">
+          <option value="">— Selecciona el bloque de horario activo —</option>
+          <option value="07:00 AM - 08:00 AM">07:00 AM - 08:00 AM</option>
+          <option value="08:00 AM - 09:00 AM">08:00 AM - 09:00 AM</option>
+          <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
+          <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+          <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+          <option value="12:00 PM - 01:00 PM">12:00 PM - 01:00 PM</option>
+          <option value="01:00 PM - 02:00 PM">01:00 PM - 02:00 PM</option>
+          <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+          <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
+          <option value="04:00 PM - 05:00 PM">04:00 PM - 05:00 PM</option>
+          <option value="05:00 PM - 06:00 PM">05:00 PM - 06:00 PM</option>
+          <option value="06:00 PM - 07:00 PM">06:00 PM - 07:00 PM</option>
+          <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM</option>
+        </select>
       </label>
-      <label>Escanear matrícula (o escribir y presionar Enter)
+      <label style="margin-top:1rem; display:block;">Escanear matrícula (o escribir y presionar Enter)
         <input type="text" id="scan_input" placeholder="Esperando lectura de QR / código de barras..." autocomplete="off">
       </label>
       <div id="scanFeedback" class="scan-feedback"></div>
@@ -149,12 +187,12 @@
 
     <div class="card">
       <div class="table-toolbar">
-        <h2 id="scanListTitle">Registrados en esta sesión</h2>
+        <h2 id="scanListTitle">Registrados en este horario</h2>
         <button class="btn-secondary" id="closeSessionBtn">Cerrar sesión y aplicar inasistencias</button>
       </div>
       <div class="table-wrap">
         <table id="scanTable">
-          <thead><tr><th>Matrícula</th><th>Nombre</th><th>Carrera</th><th>Estado</th><th>Hora asistencia</th></tr></thead>
+          <thead><tr><th>Matrícula</th><th>Nombre</th><th>Actividad</th><th>Carrera</th><th>Estado</th><th>Hora asistencia</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -167,7 +205,7 @@
       <h1>Actividades y sesiones</h1>
       <button class="btn-primary" id="newActividadBtn">+ Nueva actividad</button>
     </div>
-    <p class="section-sub">Al crear una actividad nueva, defines su fecha y hora en el mismo paso.</p>
+    <p class="section-sub">Monitoreo general de actividades.</p>
     <div id="actividadesGrid" class="actividades-grid"></div>
   </section>
 
@@ -211,15 +249,6 @@
       <label class="btn-secondary file-import">Importar JSON
         <input type="file" id="importJsonInput" accept="application/json" class="hidden">
       </label>
-    </div>
-    <div class="card">
-      <h2>Resumen de lo que se exporta</h2>
-      <ul class="bullets">
-        <li><strong>Hoja Registros:</strong> matrícula, nombre, carrera, docente, grupo, actividad, fecha de sesión, estado de asistencia, hora de asistencia.</li>
-        <li><strong>Hoja Resumen por actividad:</strong> registrados, asistieron, no asistieron, % asistencia.</li>
-        <li><strong>Hoja Resumen por carrera:</strong> total de asistencias por carrera.</li>
-        <li><strong>Hoja Sanciones:</strong> estudiantes con restricción activa y fecha en que se levanta.</li>
-      </ul>
     </div>
   </section>
 
@@ -311,17 +340,35 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 
-<!-- ANULACIÓN DE VALIDACIONES VIEJAS DE APP.JS -->
+<!-- LÓGICA DE UNIFICACIÓN Y COMPATIBILIDAD CON ESCANEO -->
 <script>
   window.addEventListener('DOMContentLoaded', () => {
-    // 1. Evitar que app.js sobreescriba el campo con un menú desplegable
+    // Sincronizar campos de registro con el objeto interno que guarda la app
+    const actNombre = document.getElementById('f_actividad_nombre');
+    const horarioSel = document.getElementById('f_horario_select');
+    const inputSesion = document.getElementById('f_sesion');
+
+    function syncSesionValue() {
+      const act = actNombre.value.trim();
+      const hor = horarioSel.value.trim();
+      if (act && hor) {
+        inputSesion.value = `${act} (${hor})`;
+      } else {
+        inputSesion.value = act || hor;
+      }
+    }
+
+    actNombre.addEventListener('input', syncSesionValue);
+    horarioSel.addEventListener('change', syncSesionValue);
+
+    // Evitar que la lógica antigua sobrescriba las opciones desplegables
     window.renderSelectSesiones = function() {};
-    
-    // 2. Anular la validación de ID que bloquea los envíos manuales
+
+    // Forzar que el estado acepte cualquier sesión de texto enviada
     if (typeof state !== 'undefined') {
       state.findSesion = function(val) {
         if (!val) return null;
-        return { id: 'manual_' + Date.now(), nombre: val, cupo: 999 };
+        return { id: 'manual_' + val, nombre: val, cupo: 999 };
       };
     }
   });
