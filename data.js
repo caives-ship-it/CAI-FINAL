@@ -226,3 +226,105 @@ const FIREBASE_CONFIG = {
 const DEFAULT_STAFF_PASSWORD = "CAI2026";
 const DEFAULT_DOCENTE_PASSWORD = "CAIdocentes";
 const SANCTION_DAYS = 7;
+
+// =========================================================
+// CAMBIO DEFINITIVO: SEPARAR ACTIVIDAD Y HORARIOS DESPLEGABLES
+// =========================================================
+
+// 1. Modificar el renderizado del formulario de Registro
+const originalRenderRegistro = window.renderRegistroForm || function(){};
+
+function aplicarNuevoFormularioRegistro() {
+  const formCard = document.querySelector('#tab-registro .form-card');
+  if (!formCard) return;
+
+  // Inyectar el nuevo HTML con los dos campos separados
+  formCard.innerHTML = `
+    <h2>Datos del estudiante</h2>
+    <form id="registroForm" autocomplete="off">
+      <label>Matrícula
+        <input type="text" id="f_matricula" placeholder="Ej. FT12345" required maxlength="20">
+      </label>
+      <div class="carrera-detect" id="carreraDetect">
+        <span class="carrera-detect-label">Carrera detectada</span>
+        <span class="carrera-detect-value" id="carreraDetectValue">— escribe tu matrícula —</span>
+      </div>
+      <label id="carreraManualWrap" class="hidden">Selecciona tu carrera
+        <select id="f_carrera_manual"></select>
+      </label>
+
+      <label>Nombre completo
+        <input type="text" id="f_nombre" placeholder="Nombre(s) y apellidos" required>
+      </label>
+
+      <div class="grid-2">
+        <label>Docente de inglés
+          <input type="text" id="f_docente" placeholder="Nombre del docente" required>
+        </label>
+        <label>Grupo de inglés
+          <input type="text" id="f_grupo" placeholder="Ej. B1-302" required>
+        </label>
+      </div>
+
+      <!-- CAMPO 1: NOMBRE DE LA ACTIVIDAD -->
+      <label>Nombre de la actividad
+        <input type="text" id="f_actividad_nombre" placeholder="Ej. Club de Conversación" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; margin-top: 0.25rem;">
+      </label>
+
+      <!-- CAMPO 2: HORARIO DESPLEGABLE -->
+      <label style="margin-top: 1rem; display: block;">Horario
+        <select id="f_horario_select" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; margin-top: 0.25rem;">
+          <option value="">— Selecciona un horario —</option>
+          <option value="07:00 AM - 08:00 AM">07:00 AM - 08:00 AM</option>
+          <option value="08:00 AM - 09:00 AM">08:00 AM - 09:00 AM</option>
+          <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
+          <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+          <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+          <option value="12:00 PM - 01:00 PM">12:00 PM - 01:00 PM</option>
+          <option value="01:00 PM - 02:00 PM">01:00 PM - 02:00 PM</option>
+          <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+          <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
+          <option value="04:00 PM - 05:00 PM">04:00 PM - 05:00 PM</option>
+          <option value="05:00 PM - 06:00 PM">05:00 PM - 06:00 PM</option>
+          <option value="06:00 PM - 07:00 PM">06:00 PM - 07:00 PM</option>
+          <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM</option>
+        </select>
+      </label>
+
+      <div id="formMsg" class="form-msg hidden"></div>
+
+      <button type="submit" class="btn-primary" id="submitRegistro" style="margin-top: 1.25rem; width: 100%;">Confirmar mi registro</button>
+    </form>
+  `;
+}
+
+// 2. Modificar las opciones del selector de Escaneo de Asistencia
+function aplicarNuevosHorariosAsistencia() {
+  const scanSelect = document.getElementById('scan_sesion');
+  if (!scanSelect) return;
+
+  scanSelect.innerHTML = `
+    <option value="">— Selecciona el bloque de horario activo —</option>
+    <option value="07:00 AM - 08:00 AM">07:00 AM - 08:00 AM</option>
+    <option value="08:00 AM - 09:00 AM">08:00 AM - 09:00 AM</option>
+    <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
+    <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+    <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+    <option value="12:00 PM - 01:00 PM">12:00 PM - 01:00 PM</option>
+    <option value="01:00 PM - 02:00 PM">01:00 PM - 02:00 PM</option>
+    <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+    <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM</option>
+    <option value="04:00 PM - 05:00 PM">04:00 PM - 05:00 PM</option>
+    <option value="05:00 PM - 06:00 PM">05:00 PM - 06:00 PM</option>
+    <option value="06:00 PM - 07:00 PM">06:00 PM - 07:00 PM</option>
+    <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM</option>
+  `;
+}
+
+// Ejecutar al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    aplicarNuevoFormularioRegistro();
+    aplicarNuevosHorariosAsistencia();
+  }, 300);
+});
