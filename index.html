@@ -49,7 +49,7 @@
       <div>
         <p class="eyebrow">Boarding pass lingüístico</p>
         <h1>Reserva tu lugar en la próxima actividad del CAI</h1>
-        <p class="hero-sub">Escribe tu matrícula y detectamos tu carrera automáticamente. Elige una sesión con cupo disponible y listo — tu asistencia se registra al escanear tu credencial el día del evento.</p>
+        <p class="hero-sub">Escribe tu matrícula y detectamos tu carrera automáticamente. Selecciona o escribe tu sesión y listo — tu asistencia se registra al escanear tu credencial el día del evento.</p>
       </div>
       <div class="hero-stamp" id="heroStamp">
         <svg viewBox="0 0 120 120" width="100" height="100"><circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="6 5"/><text x="60" y="55" text-anchor="middle" font-family="IBM Plex Mono" font-size="15" fill="currentColor" font-weight="600">CAI</text><text x="60" y="72" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="currentColor">UVP · ENGLISH</text></svg>
@@ -84,10 +84,14 @@
             </label>
           </div>
 
+          <!-- CAMPO PRÁCTICO Y ROBUSTO DE SESIÓN / ACTIVIDAD -->
           <label>Actividad / sesión
-            <select id="f_sesion" required>
-              <option value="">— selecciona una sesión con cupo disponible —</option>
-            </select>
+            <input list="lista-sesiones" id="f_sesion" placeholder="Toca para seleccionar o escribe tu sesión..." required autocomplete="off">
+            <datalist id="lista-sesiones">
+              <option value="Club de Conversación - Lunes 10:00 AM">
+              <option value="Taller de Gramática - Miércoles 12:00 PM">
+              <option value="Speaking Practice - Viernes 4:00 PM">
+            </datalist>
           </label>
 
           <div id="sesionPreview" class="sesion-preview hidden"></div>
@@ -162,13 +166,13 @@
     </div>
   </section>
 
-  <!-- ============ TAB: ACTIVIDADES (catálogo + sesiones) ============ -->
+  <!-- ============ TAB: ACTIVIDADES ============ -->
   <section class="tab-panel" id="tab-actividades">
     <div class="table-toolbar">
       <h1>Actividades y sesiones</h1>
       <button class="btn-primary" id="newActividadBtn">+ Nueva actividad</button>
     </div>
-    <p class="section-sub">Al crear una actividad nueva, defines su fecha y hora en el mismo paso. Si esa actividad se repite (por ejemplo cada quincena), usa "+ Agregar otra fecha" en su tarjeta para programar las siguientes ocasiones.</p>
+    <p class="section-sub">Al crear una actividad nueva, defines su fecha y hora en el mismo paso.</p>
     <div id="actividadesGrid" class="actividades-grid"></div>
   </section>
 
@@ -230,7 +234,7 @@
 
     <div class="card">
       <h2>Contraseña de staff</h2>
-      <p class="muted-sm">Protege el acceso a las pestañas administrativas en este navegador. No es un sistema de autenticación robusto: para varios dispositivos usa además la sincronización con Firebase.</p>
+      <p class="muted-sm">Protege el acceso a las pestañas administrativas en este navegador.</p>
       <div class="grid-2">
         <label>Nueva contraseña
           <input type="password" id="cfg_newpass" placeholder="Dejar vacío para no cambiar">
@@ -244,7 +248,7 @@
 
     <div class="card">
       <h2>Contraseña para docentes</h2>
-      <p class="muted-sm">Esta es la contraseña que le compartes a los docentes de inglés para que entren a "Reporte docentes" — una vista de solo lectura donde ven la asistencia de sus grupos, sin poder editar ni programar nada. Es distinta de tu contraseña de staff.</p>
+      <p class="muted-sm">Contraseña para que los docentes consulten el reporte de solo lectura.</p>
       <div class="grid-2">
         <label>Nueva contraseña
           <input type="password" id="cfg_doc_newpass" placeholder="Dejar vacío para no cambiar">
@@ -258,7 +262,7 @@
 
     <div class="card">
       <h2>Nomenclatura de matrícula → carrera</h2>
-      <p class="muted-sm">Las dos primeras letras de la matrícula determinan la carrera detectada automáticamente. Edita o agrega prefijos según cambien las nomenclaturas.</p>
+      <p class="muted-sm">Las dos primeras letras de la matrícula determinan la carrera detectada automáticamente.</p>
       <div class="table-toolbar">
         <span></span>
         <button class="btn-secondary" id="newPrefijoBtn">+ Agregar prefijo</button>
@@ -273,8 +277,7 @@
 
     <div class="card">
       <h2>Sincronización en tiempo real (Firebase)</h2>
-      <p class="muted-sm">Sin Firebase, cada dispositivo guarda su propia información en este navegador (localStorage). Con Firebase, el registro de estudiantes y el escaneo de asistencia se sincronizan al instante entre todos los dispositivos del CAI.</p>
-      <p class="muted-sm"><strong>Nota:</strong> si ya tienes una configuración incrustada en el código (archivo <code>data.js</code>), esa es la que manda para todos los dispositivos, incluido este. Lo que guardes aquí abajo solo sirve para pruebas rápidas en este navegador — si quieres cambiarla de forma permanente para todos, pide que se actualice directamente en <code>data.js</code>.</p>
+      <p class="muted-sm">Configuración de la base de datos centralizada.</p>
       <div class="grid-2">
         <label>API Key<input type="text" id="fb_apiKey"></label>
         <label>Auth Domain<input type="text" id="fb_authDomain"></label>
@@ -292,7 +295,7 @@
 
     <div class="card danger-card">
       <h2>Zona de peligro</h2>
-      <p class="muted-sm">Elimina toda la información local: actividades, sesiones, registros, sanciones y nomenclatura personalizada.</p>
+      <p class="muted-sm">Elimina toda la información local almacenada.</p>
       <button class="btn-danger" id="wipeBtn">Borrar TODOS los datos</button>
     </div>
   </section>
@@ -306,20 +309,13 @@
 
 <div class="toast-stack" id="toastStack"></div>
 
+<!-- LIBRERÍAS Y CONFIGURACIÓN UNIFICADA DE FIREBASE -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="data.js"></script>
-<script src="app.js"></script>
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+<script>
+  // Inicialización global unificada para garantizar sincronización en todos los dispositivos
   const firebaseConfig = {
     apiKey: "AIzaSyDzWPO7mRGG8fRYv3oKn_nJGXyFeO10PM8",
     authDomain: "cai26-7f0fd.firebaseapp.com",
@@ -330,9 +326,14 @@
     measurementId: "G-YTR14Z0L2S"
   };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  window.db = firebase.firestore();
 </script>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+
 </body>
 </html>
