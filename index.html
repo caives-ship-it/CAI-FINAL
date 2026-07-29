@@ -49,7 +49,7 @@
       <div>
         <p class="eyebrow">Boarding pass lingüístico</p>
         <h1>Reserva tu lugar en la próxima actividad del CAI</h1>
-        <p class="hero-sub">Escribe tu matrícula y detectamos tu carrera automáticamente. Selecciona o escribe tu sesión y listo — tu asistencia se registra al escanear tu credencial el día del evento.</p>
+        <p class="hero-sub">Escribe tu matrícula y detectamos tu carrera automáticamente. Elige una sesión con cupo disponible y listo — tu asistencia se registra al escanear tu credencial el día del evento.</p>
       </div>
       <div class="hero-stamp" id="heroStamp">
         <svg viewBox="0 0 120 120" width="100" height="100"><circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="6 5"/><text x="60" y="55" text-anchor="middle" font-family="IBM Plex Mono" font-size="15" fill="currentColor" font-weight="600">CAI</text><text x="60" y="72" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="currentColor">UVP · ENGLISH</text></svg>
@@ -84,14 +84,11 @@
             </label>
           </div>
 
-          <!-- CAMPO PRÁCTICO Y ROBUSTO DE SESIÓN / ACTIVIDAD -->
+          <!-- MENÚ DESPLEGABLE ORIGINAL RESTAURADO PARA QUE APP.JS NO MARQUE ERROR -->
           <label>Actividad / sesión
-            <input list="lista-sesiones" id="f_sesion" placeholder="Toca para seleccionar o escribe tu sesión..." required autocomplete="off">
-            <datalist id="lista-sesiones">
-              <option value="Club de Conversación - Lunes 10:00 AM">
-              <option value="Taller de Gramática - Miércoles 12:00 PM">
-              <option value="Speaking Practice - Viernes 4:00 PM">
-            </datalist>
+            <select id="f_sesion" required>
+              <option value="">— selecciona una sesión con cupo disponible —</option>
+            </select>
           </label>
 
           <div id="sesionPreview" class="sesion-preview hidden"></div>
@@ -309,31 +306,48 @@
 
 <div class="toast-stack" id="toastStack"></div>
 
-<!-- LIBRERÍAS Y CONFIGURACIÓN UNIFICADA DE FIREBASE -->
+<!-- LIBRERÍAS DE FIREBASE COMPATIBLES CON TU APP.JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-<script>
-  // Inicialización global unificada para garantizar sincronización en todos los dispositivos
-  const firebaseConfig = {
-    apiKey: "AIzaSyDzWPO7mRGG8fRYv3oKn_nJGXyFeO10PM8",
-    authDomain: "cai26-7f0fd.firebaseapp.com",
-    projectId: "cai26-7f0fd",
-    storageBucket: "cai26-7f0fd.firebasestorage.app",
-    messagingSenderId: "94359598389",
-    appId: "1:94359598389:web:38634e46c0e6b9b9b1887c",
-    measurementId: "G-YTR14Z0L2S"
-  };
-
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-  window.db = firebase.firestore();
-</script>
-
 <script src="data.js"></script>
 <script src="app.js"></script>
+
+<!-- LISTENERS EN TIEMPO REAL PARA FORZAR LA SINCRONIZACIÓN DE SESIONES EN TODOS LOS DISPOSITIVOS -->
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    // Configuración activa de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzWPO7mRGG8fRYv3oKn_nJGXyFeO10PM8",
+      authDomain: "cai26-7f0fd.firebaseapp.com",
+      projectId: "cai26-7f0fd",
+      storageBucket: "cai26-7f0fd.firebasestorage.app",
+      messagingSenderId: "94359598389",
+      appId: "1:94359598389:web:38634e46c0e6b9b9b1887c",
+      measurementId: "G-YTR14Z0L2S"
+    };
+
+    if (typeof firebase !== 'undefined') {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      const db = firebase.firestore();
+
+      // Escuchar cambios en vivo en la base de datos
+      db.collection("actividades").onSnapshot((snapshot) => {
+        // Al detectar cambios o nuevas sesiones, notifica a la app para refrescar la lista de sesiones
+        if (window.renderSelectSesiones && typeof window.renderSelectSesiones === 'function') {
+          window.renderSelectSesiones();
+        } else if (typeof renderSesiones === 'function') {
+          renderSesiones();
+        }
+      }, (error) => {
+        console.log("Esperando datos locales o sincronización:", error);
+      });
+    }
+  });
+</script>
 
 </body>
 </html>
