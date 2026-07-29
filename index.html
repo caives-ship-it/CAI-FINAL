@@ -49,7 +49,7 @@
       <div>
         <p class="eyebrow">Boarding pass lingüístico</p>
         <h1>Reserva tu lugar en la próxima actividad del CAI</h1>
-        <p class="hero-sub">Ingresa tus datos y los detalles de la sesión a la que deseas asistir. Tu registro se guardará automáticamente en el sistema.</p>
+        <p class="hero-sub">Escribe tu matrícula y datos para confirmar tu registro a la actividad deseada.</p>
       </div>
       <div class="hero-stamp" id="heroStamp">
         <svg viewBox="0 0 120 120" width="100" height="100"><circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="6 5"/><text x="60" y="55" text-anchor="middle" font-family="IBM Plex Mono" font-size="15" fill="currentColor" font-weight="600">CAI</text><text x="60" y="72" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="currentColor">UVP · ENGLISH</text></svg>
@@ -59,48 +59,46 @@
     <div class="registro-layout">
       <div class="card form-card">
         <h2>Datos del estudiante</h2>
-        
-        <!-- FORMULARIO DIRECTO CON ENTRADAS MANUALES -->
-        <form id="registroFormManual" autocomplete="off">
+        <form id="registroForm" autocomplete="off">
           <label>Matrícula
-            <input type="text" id="m_matricula" placeholder="Ej. FT12345" required maxlength="20">
+            <input type="text" id="f_matricula" placeholder="Ej. FT12345" required maxlength="20">
+          </label>
+          <div class="carrera-detect" id="carreraDetect">
+            <span class="carrera-detect-label">Carrera detectada</span>
+            <span class="carrera-detect-value" id="carreraDetectValue">— escribe tu matrícula —</span>
+          </div>
+          <label id="carreraManualWrap" class="hidden">Selecciona tu carrera (no se detectó automáticamente)
+            <select id="f_carrera_manual"></select>
           </label>
 
           <label>Nombre completo
-            <input type="text" id="m_nombre" placeholder="Nombre(s) y apellidos" required>
-          </label>
-
-          <label>Carrera
-            <input type="text" id="m_carrera" placeholder="Ej. Licenciatura en Lenguas Extranjeras" required>
+            <input type="text" id="f_nombre" placeholder="Nombre(s) y apellidos" required>
           </label>
 
           <div class="grid-2">
             <label>Docente de inglés
-              <input type="text" id="m_docente" placeholder="Nombre del docente" required>
+              <input type="text" id="f_docente" placeholder="Nombre del docente" required>
             </label>
             <label>Grupo de inglés
-              <input type="text" id="m_grupo" placeholder="Ej. B1-302" required>
+              <input type="text" id="f_grupo" placeholder="Ej. B1-302" required>
             </label>
           </div>
 
-          <!-- CAMPOS MANUALES DE ACTIVIDAD Y SESIÓN -->
-          <label>Actividad / Taller
-            <input type="text" id="m_actividad" placeholder="Escribe la actividad (Ej. Taller de Conversación)" required>
+          <!-- CAMPO TEXTUAL DIRECTO PARA ACTIVIDAD/SESIÓN (SIN MENU DESPLEGABLE) -->
+          <label>Actividad / Sesión
+            <input type="text" id="f_sesion" placeholder="Escribe el nombre del taller u horario" required style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; margin-top: 0.25rem;">
           </label>
 
-          <label>Sesión / Horario
-            <input type="text" id="m_sesion" placeholder="Escribe el horario (Ej. Viernes 10:00 AM)" required>
-          </label>
+          <div id="sesionPreview" class="sesion-preview hidden"></div>
+          <div id="formMsg" class="form-msg hidden"></div>
 
-          <div id="manualMsg" class="form-msg hidden"></div>
-
-          <button type="submit" class="btn-primary" id="submitManual" style="margin-top: 15px; width: 100%;">Confirmar mi registro</button>
+          <button type="submit" class="btn-primary" id="submitRegistro" style="margin-top: 1rem;">Confirmar mi registro</button>
         </form>
       </div>
 
       <div class="card catalog-card">
         <h2>Talleres y clubes disponibles</h2>
-        <p class="muted-sm">Consulta las actividades programadas para escribir sus nombres exactos al registrarte.</p>
+        <p class="muted-sm">Consulta objetivo, nivel y sede antes de registrarte.</p>
         <div id="catalogList" class="catalog-list"></div>
       </div>
     </div>
@@ -306,7 +304,6 @@
 
 <div class="toast-stack" id="toastStack"></div>
 
-<!-- LIBRERÍAS DE FIREBASE COMPATIBLES -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -314,64 +311,18 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 
-<!-- SCRIPT INDEPENDIENTE PARA GUARDADO MANUAL -->
+<!-- ANULACIÓN DE VALIDACIONES VIEJAS DE APP.JS -->
 <script>
   window.addEventListener('DOMContentLoaded', () => {
-    // Configuración de tu proyecto
-    const firebaseConfig = {
-      apiKey: "AIzaSyDzWPO7mRGG8fRYv3oKn_nJGXyFeO10PM8",
-      authDomain: "cai26-7f0fd.firebaseapp.com",
-      projectId: "cai26-7f0fd",
-      storageBucket: "cai26-7f0fd.firebasestorage.app",
-      messagingSenderId: "94359598389",
-      appId: "1:94359598389:web:38634e46c0e6b9b9b1887c",
-      measurementId: "G-YTR14Z0L2S"
-    };
-
-    if (typeof firebase !== 'undefined') {
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-      }
-      const db = firebase.firestore();
-
-      const formManual = document.getElementById('registroFormManual');
-      const msgBox = document.getElementById('manualMsg');
-
-      formManual.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const registroData = {
-          matricula: document.getElementById('m_matricula').value.trim(),
-          nombre: document.getElementById('m_nombre').value.trim(),
-          carrera: document.getElementById('m_carrera').value.trim(),
-          docente: document.getElementById('m_docente').value.trim(),
-          grupo: document.getElementById('m_grupo').value.trim(),
-          actividad: document.getElementById('m_actividad').value.trim(),
-          sesion: document.getElementById('m_sesion').value.trim(),
-          fechaRegistro: firebase.firestore.FieldValue.serverTimestamp(),
-          asistencia: "registrado"
-        };
-
-        try {
-          // Guardar en la base de datos de Firebase
-          await db.collection("registros").add(registroData);
-
-          msgBox.className = "form-msg";
-          msgBox.style.backgroundColor = "#d4edda";
-          msgBox.style.color = "#155724";
-          msgBox.textContent = "¡Registro realizado con éxito! Tu lugar ha quedado reservado.";
-          msgBox.classList.remove('hidden');
-
-          formManual.reset();
-        } catch (error) {
-          console.error("Error al guardar registro:", error);
-          msgBox.className = "form-msg";
-          msgBox.style.backgroundColor = "#f8d7da";
-          msgBox.style.color = "#721c24";
-          msgBox.textContent = "Ocurrió un error al guardar tu registro. Revisa tu conexión e intenta de nuevo.";
-          msgBox.classList.remove('hidden');
-        }
-      });
+    // 1. Evitar que app.js sobreescriba el campo con un menú desplegable
+    window.renderSelectSesiones = function() {};
+    
+    // 2. Anular la validación de ID que bloquea los envíos manuales
+    if (typeof state !== 'undefined') {
+      state.findSesion = function(val) {
+        if (!val) return null;
+        return { id: 'manual_' + Date.now(), nombre: val, cupo: 999 };
+      };
     }
   });
 </script>
